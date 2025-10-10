@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{66563e89-6dea-4511-b1c1-55414e8ae6e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public">
+      <UniqueIdentifier>{8cf0b901-3e6d-4490-9ab6-f5c6fe205f3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{4d86e1a5-97ec-4b36-9a79-f28b0bea4a6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\hde">
+      <UniqueIdentifier>{6968e193-ae41-4f3b-b54c-10ddc4db275c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\hde\public">
+      <UniqueIdentifier>{d4d27c3e-9f50-4246-a5ca-ea28c7e30a36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\hde\src">
+      <UniqueIdentifier>{92beb7e1-e494-4781-954d-be87c0880e89}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\vendor\hde\src\hde64.c">
+      <Filter>vendor\hde\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\vendor\hde\src\hde32.c">
+      <Filter>vendor\hde\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_errors.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_mempool.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_misc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_options.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_read.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_rtti.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_search.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_signature.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_windows.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_write.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_ext_logger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_ext_module.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_ext_patch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_ext_sig.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_utils_assert.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_utils_buffer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_utils_format.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_utils_msgbox.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_utils_secure.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_common.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_check.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_debug.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\vendor\hde\src\hde_utils.c">
+      <Filter>vendor\hde\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_core_hook.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memoria_utils_unicode.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\vendor\hde\public\table32.h">
+      <Filter>vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\hde\public\table64.h">
+      <Filter>vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\hde\public\hde32.h">
+      <Filter>vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\hde\public\hde64.h">
+      <Filter>vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_common.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_check.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_debug.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_errors.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_hash.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_mempool.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_misc.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_options.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_read.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_rtti.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_search.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_signature.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_windows.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_write.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_ext_logger.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_ext_module.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_ext_patch.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_ext_sig.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_utils_assert.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_utils_buffer.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_utils_format.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_utils_list.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_utils_msgbox.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_utils_optional.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_utils_secure.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_utils_vector.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_amalgamation.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\hde\public\hde_utils.h">
+      <Filter>vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_core_hook.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\hde\public\hde_common.h">
+      <Filter>vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_config.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\memoria_utils_unicode.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
