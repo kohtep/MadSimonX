@@ -40,7 +40,7 @@ The original **MadSimon** included various experimental functions I created to t
 
 The rewritten version of **MadSimon** also introduces additional features, such as:
 
-* Raw Input for the mouse (m_rawinput 1)
+* Raw Input for the mouse (m_rawinput 1; experimental feature)
 
 ## Console Commands maybe?
 
@@ -49,6 +49,7 @@ A full list of available commands is provided below.
 
 | Command / CVar | Description |
 |-----------------|-------------|
+| `find` | Search for console commands and variables by substring. |
 | `ent_create` | Spawns an entity at the position the player is currently looking at. |
 | `ent_remove` | Removes the entity the player is currently looking at. |
 | `ent_killed` | Kills the entity the player is currently looking at. |
@@ -67,15 +68,16 @@ A full list of available commands is provided below.
 | `infinite_health` | Infinite health. |
 | `infinite_ammo` | Infinite ammo. |
 | `hud_nprintf_time` | Sets the duration (in seconds) for how long `nprintf` info is displayed on screen. |
-| `noviewpunch` | Disables view shaking. |
+| `mp_noviewpunch` | Disables view shaking. |
 | `always_first_deploy` | Always plays the first-time weapon draw animation. I liked how it looked and enjoyed watching it. |
 | `simon_showinfo` | Displays various debugging information about the game world. |
-| `m_rawinput` | MadSimonX implements the `m_rawinput` variable for Cry of Fear. The behavior is the same as in other GoldSource games. |
+| `m_rawinput` | **MadSimon** implements the `m_rawinput` variable for Cry of Fear. The behavior is the same as in other GoldSource games. |
 
 ## How to Use
 
-Use any convenient method to inject the library into the game process.  
-I typically use **Process Hacker**, but you likely already know which injection method you will use.
+Place the **MadSimon** library, after renaming it to `CrashRpt.dll`, into the `cryoffear\cl_dlls` folder. In this case, **MadSimon** will be loaded automatically each time the game starts.
+
+Alternatively, use any injection method convenient for you, for example via **Process Hacker**.
 
 ## License
 
