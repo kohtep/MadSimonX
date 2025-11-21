@@ -68,7 +68,7 @@ A full list of available commands is provided below.
 | `infinite_health` | Infinite health. |
 | `infinite_ammo` | Infinite ammo. |
 | `hud_nprintf_time` | Sets the duration (in seconds) for how long `nprintf` info is displayed on screen. |
-| `mp_noviewpunch` | Disables view shaking. |
+| `noviewpunch` | Disables view shaking. |
 | `always_first_deploy` | Always plays the first-time weapon draw animation. I liked how it looked and enjoyed watching it. |
 | `simon_showinfo` | Displays various debugging information about the game world. |
 | `m_rawinput` | **MadSimon** implements the `m_rawinput` variable for Cry of Fear. The behavior is the same as in other GoldSource games. |
