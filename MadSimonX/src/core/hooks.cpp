@@ -325,7 +325,7 @@ void BackupOriginalCode()
 
 void RestoreHooks()
 {
-	if (U::Memory::IsDllLoaded("engine.dll"))
+	if (U::Memory::IsDllLoaded("hw.dll"))
 	{
 		// If hw.dll is unloaded, then P::game is no longer valid,
 		// and there is no point in trying to modify the game window in any way.
