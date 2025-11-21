@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 
-#include "memoria_amalgamation.hpp"
+#include "utils/mdl_utils.hpp"
 
 #include "hlsdk/dlls/extdll.h"
 
@@ -46,6 +46,53 @@
 #include "hlsdk/dlls/weapons.h"
 #include "hlsdk/dlls/player.h"
 
+struct IBaseSystem;
+
+struct IGameUI007
+{
+	virtual void Create(bool Dispose) = 0;
+	virtual bool Initialize(CreateInterfaceFn *factories, int count) = 0;
+	virtual void Start(cl_enginefuncs_s *engineFuncs, int interfaceVersion, IBaseSystem *system) = 0;
+	virtual void Shutdown() = 0;
+	virtual bool ActivateGameUI() = 0;
+	virtual bool ActivateDemoUI() = 0;
+	virtual bool HasExclusiveInput() = 0;
+	virtual void RunFrame() = 0;
+	virtual void ConnectToServer(const char *game, int IP, int port) = 0;
+	virtual void DisconnectFromServer() = 0;
+	virtual void HideGameUI() = 0;
+	virtual bool IsGameUIActive() = 0;
+	virtual void LoadingStarted(const char *resourceType, const char *resourceName) = 0;
+	virtual void LoadingFinished(const char *resourceType, const char *resourceName) = 0;
+	virtual void StartProgressBar(const char *progressType, int progressSteps) = 0;
+	virtual int ContinueProgressBar(int progressPoint, float progressFraction) = 0;
+	virtual void StopProgressBar(bool bError, const char *failureReason, const char *extendedReason) = 0;
+	virtual int SetProgressBarStatusText(const char *statusText) = 0;
+	virtual void SetSecondaryProgressBar(float progress) = 0;
+	virtual void SetSecondaryProgressBarText(const char *statusText) = 0;
+	virtual void ValidateCDKey(bool force, bool inConnect) = 0;
+	virtual void OnDisconnectFromServer(int eSteamLoginFailure, const char *username) = 0;
+};
+
+struct IGame
+{
+	virtual ~IGame() = 0;
+	virtual bool Init(void *pvInstance) = 0;
+	virtual bool Shutdown() = 0;
+	virtual bool CreateGameWindow() = 0;
+	virtual void SleepUntilInput(int time) = 0;
+	virtual HWND GetMainWindow() = 0;
+	virtual HWND *GetMainWindowAddress() = 0;
+	virtual void SetWindowXY(int x, int y) = 0;
+	virtual void SetWindowSize(int w, int h) = 0;
+	virtual void GetWindowRect(int *x, int *y, int *w, int *h) = 0;
+	virtual bool IsActiveApp() = 0;
+	virtual bool IsMultiplayer() = 0;
+	virtual void PlayStartupVideos() = 0;
+	virtual void PlayAVIAndWait(const char *aviFile) = 0;
+	virtual void SetCursorVisible(bool bState) = 0;
+};
+
 // Globals
 namespace G
 {
@@ -67,8 +114,10 @@ namespace G
 // Modules
 namespace M
 {
-	extern Memoria::CMemoryModule &GetEngine(); // hw.dll
-	extern Memoria::CMemoryModule &GetModLib(); // hl.dll
+	extern U::Memory::module_t &GetEngine(); // hw.dll
+	extern U::Memory::module_t &GetModLib(); // hl.dll
+	extern U::Memory::module_t &GetClient(); // client.dll
+	extern U::Memory::module_t &GetGameUI(); // GameUI.dll
 }
 
 // Pointers
@@ -82,7 +131,9 @@ namespace P
 		using ViewPunch_t = void(__fastcall *)(CBasePlayer *that, int, float p, float y, float r);
 		using CBaseEntity_Create_t = bool(__cdecl *)(const char *szName, const Vector *vecOrigin, const Vector *vecAngles, edict_t *pentOwner);
 		using UTIL_Remove_t = void(__cdecl *)(CBaseEntity *pEntity);
-		using WorldPrecache_t = void(*)(void *self);
+		using WorldPrecache_t = void(__fastcall *)(void *self);
+
+		using GetCursorPos_t = BOOL(WINAPI *)(LPPOINT lpPoint);
 	}
 
 	inline Internal::UTIL_FindEntityByString_t UTIL_FindEntityByString;
@@ -116,10 +167,19 @@ namespace P
 
 	inline int *sv_numedicts;
 	inline edict_s *sv_edicts;
+
+	inline IGame *game;
+	inline IGameUI007 *gameui;
+
+	inline WNDPROC WndProc;
+
+	inline int *mx_accum;
+	inline int *my_accum;
 }
 
+extern void InitCoreGlobals();
 extern void InitGlobals();
-extern void InitPointers();
+
 extern void InitConCmds();
 
 #define STRING(offset) ((const char *)(&(*P::gGlobals)->pStringBase[offset]))

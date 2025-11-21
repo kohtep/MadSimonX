@@ -1,5 +1,7 @@
 #include "hooks.hpp"
 
+#include <memory>
+
 #include "core/global.hpp"
 
 #include "common/simon.h"
@@ -8,8 +10,16 @@
 #include "utils/rendering.hpp"
 #include "utils/app_utils.hpp"
 #include "utils/nprintf.hpp"
+#include "utils/mem_utils.hpp"
+#include "utils/file_utils.hpp"
 
 #include "common/precache.hpp"
+#include "common/rawinput.hpp"
+
+extern void ApplyHooks();
+
+static P::Internal::ViewPunch_t orgCBasePlayer_ViewPunch;
+static P::Internal::GetCursorPos_t orgGetCursorPos;
 
 // Utils
 
@@ -81,6 +91,50 @@ static const char *MoveTypeToString(int movetype)
 }
 
 // Impl
+
+#define MADSIMON_CONFIG "madsimon.cfg"
+
+static void ExecuteMadSimonConfig()
+{
+	char path[MAX_PATH];
+	const char *gameDir = G::Engine.pfnGetGameDirectory();
+
+	if (!gameDir)
+		return;
+
+	snprintf(path, sizeof(path), "%s\\%s", gameDir, MADSIMON_CONFIG);
+	path[sizeof(path) - 1] = '\0';
+
+	if (U::File::FileExists(path))
+	{
+		char cmd[512];
+
+		snprintf(cmd, sizeof(cmd), "exec \"%s\"\n", MADSIMON_CONFIG);
+		cmd[sizeof(cmd) - 1] = '\0';
+
+		G::Engine.pfnClientCmd(cmd);
+
+		// A small hack to invoke Cbuf_Execute in order to run the above
+		// 'exec' command within the current frame. This function calls only
+		// Cbuf_Execute, so it is safe.
+		G::Server.pfnServerExecute();
+	}
+}
+
+static void hkHUD_Frame_Init(double time)
+{
+	if (U::Memory::IsDllLoaded("hw.dll") && U::Memory::IsDllLoaded("hl.dll") && U::Memory::IsDllLoaded("client.dll"))
+	{
+		InitGlobals();
+
+		InitConCmds();
+		ExecuteMadSimonConfig();
+
+		ApplyHooks();
+
+		G::Engine.Con_Printf("MadSimonX successfully initialized.\n");
+	}
+}
 
 static void hkHUD_Frame(double time)
 {
@@ -184,10 +238,9 @@ static void hkServerDeactivate()
 	G::EntityInterface.pfnServerDeactivate();
 }
 
-static P::Internal::ViewPunch_t orgCBasePlayer_ViewPunch;
 static void __fastcall hkCBasePlayer_ViewPunch(CBasePlayer *that, int, float p, float y, float r)
 {
-	if (C::mp_noviewpunch && C::mp_noviewpunch->value > 0.0)
+	if (C::noviewpunch && C::noviewpunch->value > 0.0)
 		return;
 
 	orgCBasePlayer_ViewPunch(that, 0, p, y, r);
@@ -199,24 +252,127 @@ static void __fastcall hkWorldPrecache(void *self)
 	P::WorldPrecache(self);
 }
 
-void InitHooks()
+static BOOL WINAPI hkGetCursorPos(LPPOINT lpPoint)
 {
-	Memoria::WritePointer(&P::Client->pHudFrame, hkHUD_Frame);
-	Memoria::WritePointer(&P::Client->pHudRedrawFunc, hkHUD_Redraw);
-	Memoria::WritePointer(&P::EntityInterface->pfnServerDeactivate, hkServerDeactivate);
+	if (!lpPoint)
+		return FALSE;
 
-	Memoria::Hook32(P::ViewPunch, hkCBasePlayer_ViewPunch, &orgCBasePlayer_ViewPunch, Memoria::eInvokeMethod::JumpRel);
+	const bool is_client_lib = U::Memory::IsInBounds(_ReturnAddress(), M::GetClient().Handle, M::GetClient().LastByte);
+	if (!is_client_lib)
+		return orgGetCursorPos(lpPoint);
 
-	Memoria::FillNops(P::BunnyHopSpeedUpBlockPtr, 5);
+	if (P::gameui->IsGameUIActive())
+	{
+		//
+		// A quick fix for a bug that causes the protagonist's camera
+		// to move after alt-tabbing while the game is paused.
+		//
 
-	Memoria::WriteU8(P::NPrintfDelayFix1, 0xD8); // double -> float
-	Memoria::WritePointer(P::NPrintfDelayFix2, &C::nprintf_time->value);
+		const int cx = G::Engine.GetWindowCenterX();
+		const int cy = G::Engine.GetWindowCenterY();
+
+		lpPoint->x = cx;
+		lpPoint->y = cy;
+	}
+	else if (C::m_rawinput && C::m_rawinput->value > 0.0f)
+	{
+		//
+		// Just like in the case of the quick fix, it simply replaces the result
+		// of GetCursorPos with its own.
+		//
+		// Returning the 'GetWindowCenter' data means that a pointer to the
+		// center of the window will be returned, which is equivalent to the
+		// cursor not having moved.
+		//
+		// All core logic for raw input movement is implemented through the
+		// modification of the 'mx_accum' and 'my_accum' pointers.
+		//
+
+		const int cx = G::Engine.GetWindowCenterX();
+		const int cy = G::Engine.GetWindowCenterY();
+
+		lpPoint->x = cx;
+		lpPoint->y = cy;
+	}
+	else
+	{
+		return orgGetCursorPos(lpPoint);
+	}
+
+	return TRUE;
+}
+
+static DWORD CALLBACK hkWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	ProcessRawInput(msg, wParam, lParam);
+
+	return CallWindowProc(P::WndProc, hwnd, msg, wParam, lParam);
+}
+
+void BackupOriginalCode()
+{
+	U::Memory::CreateMemoryBackup(P::Engine, sizeof(*P::Engine));
+	U::Memory::CreateMemoryBackup(P::Server, sizeof(*P::Server));
+	U::Memory::CreateMemoryBackup(P::EntityInterface, sizeof(*P::EntityInterface));
+
+	U::Memory::CreateMemoryBackup(P::BunnyHopSpeedUpBlockPtr, 5);
+	U::Memory::CreateMemoryBackup(P::NPrintfDelayFix1, sizeof(uint8_t));
+	U::Memory::CreateMemoryBackup(P::NPrintfDelayFix2, sizeof(float));
+	U::Memory::CreateMemoryBackup(P::UnlockGodmodeFunc, 6);
+	U::Memory::CreateMemoryBackup(P::UnlockNoclipFunc, 10);
+	U::Memory::CreateMemoryBackup(P::WorldPrecacheCall, sizeof(void *));
+}
+
+void RestoreHooks()
+{
+	if (U::Memory::IsDllLoaded("engine.dll"))
+	{
+		// If hw.dll is unloaded, then P::game is no longer valid,
+		// and there is no point in trying to modify the game window in any way.
+
+		SetWindowLongPtr(P::game->GetMainWindow(), GWL_WNDPROC, (LONG)P::WndProc);
+		DisableRawInputForWindow(P::game->GetMainWindow());
+	}
+
+	U::Memory::RestoreMemoryBackups();
+
+	U::Memory::Unsplice(orgCBasePlayer_ViewPunch);
+	U::Memory::Unsplice(orgGetCursorPos);
+}
+
+void ApplyCoreHooks()
+{
+	U::Memory::CreateMemoryBackup(P::Client, sizeof(*P::Client));
+
+	U::Memory::WritePointer(&P::Client->pHudFrame, hkHUD_Frame_Init);
+}
+
+void ApplyHooks()
+{
+	BackupOriginalCode();
+
+	U::Memory::WritePointer(&P::Client->pHudFrame, hkHUD_Frame);
+	U::Memory::WritePointer(&P::Client->pHudRedrawFunc, hkHUD_Redraw);
+	U::Memory::WritePointer(&P::EntityInterface->pfnServerDeactivate, hkServerDeactivate);
+
+	U::Memory::Splice(P::ViewPunch, hkCBasePlayer_ViewPunch, &orgCBasePlayer_ViewPunch, false);
+
+	U::Memory::FillNops(P::BunnyHopSpeedUpBlockPtr, 5);
+
+	U::Memory::WriteU8(P::NPrintfDelayFix1, 0xD8); // double -> float
+	U::Memory::WritePointer(P::NPrintfDelayFix2, &C::nprintf_time->value);
 
 	// Remove CBasePlayer::PostThink FL_GODMODE flag reset for 'god' cmd
-	Memoria::FillNops(P::UnlockGodmodeFunc, 6);
+	U::Memory::FillNops(P::UnlockGodmodeFunc, 6);
 
 	// Remove CBasePlayer::PostThink MOVETYPE_NOCLIP reset for 'noclip' cmd
-	Memoria::FillNops(P::UnlockNoclipFunc, 10);
+	U::Memory::FillNops(P::UnlockNoclipFunc, 10);
 
-	Memoria::WriteHook32(P::WorldPrecacheCall, hkWorldPrecache, Memoria::eInvokeMethod::CallRel);
+	U::Memory::WritePointer(P::WorldPrecacheCall, hkWorldPrecache);
+
+	// Raw Input
+
+	P::WndProc = (WNDPROC)SetWindowLongPtr(P::game->GetMainWindow(), GWL_WNDPROC, (LONG)hkWndProc);
+	U::Memory::SpliceAPI("USER32.dll", "GetCursorPos", hkGetCursorPos, &orgGetCursorPos, false);
+	EnableRawInputForWindow(P::game->GetMainWindow());
 }

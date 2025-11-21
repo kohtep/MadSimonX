@@ -16,6 +16,21 @@
     <Filter Include="src\utils">
       <UniqueIdentifier>{49a34999-6896-4552-a40a-97dae71b4211}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\vendor">
+      <UniqueIdentifier>{ba4445df-3cbd-43f0-a212-76b5ceca485e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vendor\hde">
+      <UniqueIdentifier>{36aef56f-a8ba-4566-9340-1de31e848265}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vendor\hde\public">
+      <UniqueIdentifier>{1e091617-1a89-4dda-b7bc-2b074fce4ed6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vendor\hde\src">
+      <UniqueIdentifier>{f5b16630-5182-40ac-bb40-577585569867}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{3d4b57ca-3821-4b62-bbac-f67d191a384a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\core\main.cpp">
@@ -47,6 +62,27 @@
     </ClCompile>
     <ClCompile Include="..\src\common\precache.cpp">
       <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utils\mem_utils.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\common\rawinput.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utils\mdl_utils.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vendor\hde\src\hde64.c">
+      <Filter>src\vendor\hde\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vendor\hde\src\hde_utils.c">
+      <Filter>src\vendor\hde\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vendor\hde\src\hde32.c">
+      <Filter>src\vendor\hde\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utils\file_utils.cpp">
+      <Filter>src\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -83,5 +119,43 @@
     <ClInclude Include="..\src\common\precache.hpp">
       <Filter>src\common</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\utils\mem_utils.hpp">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\common\rawinput.hpp">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\mdl_utils.hpp">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vendor\hde\public\hde32.h">
+      <Filter>src\vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vendor\hde\public\hde64.h">
+      <Filter>src\vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vendor\hde\public\table32.h">
+      <Filter>src\vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vendor\hde\public\table64.h">
+      <Filter>src\vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vendor\hde\public\hde_common.h">
+      <Filter>src\vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vendor\hde\public\hde_utils.h">
+      <Filter>src\vendor\hde\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\file_utils.hpp">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\resources\resource.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\resources\MadSimonX.rc">
+      <Filter>resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

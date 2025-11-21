@@ -1,3 +1,4 @@
 #pragma once
 
-extern void InitHooks();
+extern void ApplyCoreHooks();
+extern void RestoreHooks();

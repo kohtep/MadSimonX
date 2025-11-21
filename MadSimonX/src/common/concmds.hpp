@@ -5,15 +5,20 @@
 // MadSimon & Native CVars
 namespace C
 {
-	extern cvar_t *always_first_deploy;
-	extern cvar_t *infinite_stamina;
-	extern cvar_t *infinite_health;
-	extern cvar_t *infinite_ammo;
-	extern cvar_t *nprintf_time;
-	extern cvar_t *ent_info;
-	extern cvar_t *ent_info_type;
-	extern cvar_t *ent_info_filter;
-	extern cvar_t *mp_noviewpunch;
+	inline cvar_t *always_first_deploy;
+	inline cvar_t *infinite_stamina;
+	inline cvar_t *infinite_health;
+	inline cvar_t *infinite_ammo;
+	inline cvar_t *nprintf_time;
+	inline cvar_t *ent_info;
+	inline cvar_t *ent_info_type;
+	inline cvar_t *ent_info_filter;
+	inline cvar_t *noviewpunch;
 
-	extern cvar_t *sv_cheats;
+	inline cvar_t *sv_cheats;
+
+	inline cvar_t *sensitivity;
+	inline cvar_t *m_rawinput;
+	inline cvar_t *m_yaw;
+	inline cvar_t *m_pitch;
 }

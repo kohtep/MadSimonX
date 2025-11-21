@@ -21,7 +21,7 @@ void CSimon::DebugHeader()
 	U::NPrintf::Add();
 
 	U::NPrintf::Add("MadSimonX / kohtep");
-	U::NPrintf::Add("Build: %d", BUILD_NUM);
+	U::NPrintf::Add("Build: %d", build_number());
 	U::NPrintf::Add();
 }
 

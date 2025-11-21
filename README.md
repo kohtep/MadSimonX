@@ -38,9 +38,13 @@ The original **MadSimon** included various experimental functions I created to t
 * Real-time debugging information about entities
 * Various small additions made just for fun
 
-## Console Commands
+The rewritten version of **MadSimon** also introduces additional features, such as:
 
-Of course. For convenient control, it's best to use the engine's built-in API rather than reinventing your own system.  
+* Raw Input for the mouse (m_rawinput 1)
+
+## Console Commands maybe?
+
+Sure thing. For convenient control, it's best to use the engine's built-in API rather than reinventing your own system.  
 A full list of available commands is provided below.
 
 | Command / CVar | Description |
@@ -63,9 +67,10 @@ A full list of available commands is provided below.
 | `infinite_health` | Infinite health. |
 | `infinite_ammo` | Infinite ammo. |
 | `hud_nprintf_time` | Sets the duration (in seconds) for how long `nprintf` info is displayed on screen. |
-| `mp_noviewpunch` | Disables view shaking. |
+| `noviewpunch` | Disables view shaking. |
 | `always_first_deploy` | Always plays the first-time weapon draw animation. I liked how it looked and enjoyed watching it. |
 | `simon_showinfo` | Displays various debugging information about the game world. |
+| `m_rawinput` | MadSimonX implements the `m_rawinput` variable for Cry of Fear. The behavior is the same as in other GoldSource games. |
 
 ## How to Use
 
@@ -77,3 +82,8 @@ I typically use **Process Hacker**, but you likely already know which injection 
 This project is distributed under the **2-Clause BSD License**.
 
 Basically, you can use, modify, and share it freely, as well as use it as a learning resource - just make sure to give proper credit when using or sharing it.
+
+## Third-party components
+
+This project includes the Hacker Disassembler Engine (HDE) by Vyacheslav Patkov, licensed under the BSD 2-Clause License.  
+See `vendor/hde/LICENSE` for details.

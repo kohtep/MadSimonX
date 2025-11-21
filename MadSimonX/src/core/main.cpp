@@ -2,31 +2,39 @@
 
 #include "core/global.hpp"
 #include "core/hooks.hpp"
+
 #include "common/concmds.hpp"
+#include "common/rawinput.hpp"
+
+#include "utils/mem_utils.hpp"
 
 static void EntryMain(HINSTANCE hinstDLL, LPVOID lpReserved)
 {
-	Memoria::Startup();
+	//
+	// When loading MadSimon using the CrashRpt.dll method, most data
+	// is not yet ready.
+	//
+	// Therefore, during the loading stage we obtain the main available information
+	// and set up deferred initialization via the HUD_Frame callback,
+	// which is invoked when all data becomes available.
+	//
 
-	InitGlobals();
-	InitPointers();
+	InitCoreGlobals();
 
-	memcpy(&G::Engine, P::Engine, sizeof(G::Engine));
-	memcpy(&G::Server, P::Server, sizeof(G::Server));
-	memcpy(&G::Client, P::Client, sizeof(G::Client));
-	memcpy(&G::EntityInterface, P::EntityInterface, sizeof(G::EntityInterface));
-
-	InitConCmds();
-	InitHooks();
-
-	G::Engine.Con_Printf("MadSimonX successfully initialized.\n");
+	ApplyCoreHooks();
 }
 
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved)
 {
-	if (fdwReason == DLL_PROCESS_ATTACH)
+	switch (fdwReason)
 	{
+	case DLL_PROCESS_ATTACH:
 		EntryMain(hinstDLL, lpReserved);
+		break;
+
+	case DLL_PROCESS_DETACH:
+		RestoreHooks();
+		break;
 	}
 
 	return TRUE;

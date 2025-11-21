@@ -2,6 +2,8 @@
 
 #include "common/simon.h"
 
+#include "utils/mem_utils.hpp"
+
 void U::Ent::Spawn(const char *name, const Vector &pos)
 {
 	if (!name || !*name)
@@ -47,9 +49,9 @@ void U::Ent::Enumerate(U::Ent::IterFunc_t pfnEnumer, void *arg)
 	if (!pfnEnumer)
 		return;
 
-	auto dos = (IMAGE_DOS_HEADER *)M::GetModLib().GetBase();
-	auto nt = (IMAGE_NT_HEADERS *)(Memoria::PtrOffset(dos, dos->e_lfanew));
-	auto dir = (IMAGE_EXPORT_DIRECTORY *)(Memoria::PtrOffset(dos, nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress));
+	auto dos = (IMAGE_DOS_HEADER *)M::GetModLib().Handle;
+	auto nt = (IMAGE_NT_HEADERS *)(U::Memory::PtrOffset(dos, dos->e_lfanew));
+	auto dir = (IMAGE_EXPORT_DIRECTORY *)(U::Memory::PtrOffset(dos, nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress));
 
 	auto nameTable = (unsigned int *)((int)dos + dir->AddressOfNames);
 	auto funcTable = (unsigned int *)((int)dos + dir->AddressOfFunctions);

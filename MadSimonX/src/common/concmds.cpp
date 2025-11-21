@@ -7,17 +7,6 @@
 #include "utils/ent_utils.hpp"
 #include "utils/app_utils.hpp"
 
-cvar_t *C::always_first_deploy;
-cvar_t *C::infinite_stamina;
-cvar_t *C::infinite_health;
-cvar_t *C::infinite_ammo;
-cvar_t *C::nprintf_time;
-cvar_t *C::ent_info;
-cvar_t *C::ent_info_type;
-cvar_t *C::ent_info_filter;
-cvar_t *C::mp_noviewpunch;
-cvar_t *C::sv_cheats;
-
 // Cut Cmds
 
 static void pfnHost_God_f()
@@ -69,6 +58,92 @@ static void pfnHost_Noclip_f()
 };
 
 // Cmds
+
+#define FCMD_HUD_COMMAND		(1<<0)
+#define FCMD_GAME_COMMAND		(1<<1)
+#define FCMD_WRAPPER_COMMAND	(1<<2)
+
+static void Cmd_Find_f()
+{
+	if (G::Engine.Cmd_Argc() < 2)
+	{
+		auto hdr = G::Engine.Cmd_Argv(0);
+
+		G::Engine.Con_Printf("Usage: %s <SubString>\n", hdr);
+		G::Engine.Con_Printf("%s * for full listing\n", hdr);
+		G::Engine.Con_Printf("h - hud; g - game; w - wrap\n");
+		return;
+	}
+
+	auto cmd = reinterpret_cast<cmd_function_t *>(G::Engine.GetFirstCmdFunctionHandle());
+
+	auto str = G::Engine.Cmd_Argv(1);
+	if (*str == '*')
+		str = nullptr;
+
+	while (cmd)
+	{
+		if (str)
+		{
+			if (strstr(cmd->name, str))
+			{
+				G::Engine.Con_Printf("Name: %s", cmd->name);
+
+				G::Engine.Con_Printf(", Flags: [");
+
+				if (cmd->flags & FCMD_HUD_COMMAND)
+					G::Engine.Con_Printf("h");
+
+				if (cmd->flags & FCMD_GAME_COMMAND)
+					G::Engine.Con_Printf("g");
+
+				if (cmd->flags & FCMD_WRAPPER_COMMAND)
+					G::Engine.Con_Printf("w");
+
+				G::Engine.Con_Printf("]\n");
+			}
+		}
+		else
+		{
+			G::Engine.Con_Printf("Name: %s", cmd->name);
+
+			G::Engine.Con_Printf(", Flags: [");
+			if (cmd->flags != 0)
+			{
+				if (cmd->flags & FCMD_HUD_COMMAND)
+					G::Engine.Con_Printf("h");
+
+				if (cmd->flags & FCMD_GAME_COMMAND)
+					G::Engine.Con_Printf("g");
+
+				if (cmd->flags & FCMD_WRAPPER_COMMAND)
+					G::Engine.Con_Printf("w");
+			}
+
+			G::Engine.Con_Printf("]\n");
+		}
+
+		cmd = cmd->next;
+	}
+
+	auto cvar = G::Engine.GetFirstCvarPtr();
+	while (cvar)
+	{
+		if (str)
+		{
+			if (strstr(cvar->name, str))
+			{
+				G::Engine.Con_Printf("Name: %s, String: %s, Value: %f\n", cvar->name, cvar->string, cvar->value);
+			}
+		}
+		else
+		{
+			G::Engine.Con_Printf("Name: %s, String: %s, Value: %f\n", cvar->name, cvar->string, cvar->value);
+		}
+
+		cvar = cvar->next;
+	}
+}
 
 static void Entity_Create_f()
 {
@@ -374,6 +449,8 @@ void InitConCmds()
 {
 	// Register MadSimon commands
 
+	G::Engine.pfnAddCommand("find", Cmd_Find_f);
+
 	G::Engine.pfnAddCommand("ent_create", Entity_Create_f);
 	G::Engine.pfnAddCommand("ent_remove", Entity_Remove_f);
 	G::Engine.pfnAddCommand("ent_killed", Entity_Killed_f);
@@ -397,7 +474,7 @@ void InitConCmds()
 	C::ent_info = G::Engine.pfnRegisterVariable("ent_info", U::App::HasDebugParam() ? "1" : "0", 0);
 	C::ent_info_type = G::Engine.pfnRegisterVariable("ent_info_type", U::App::HasDebugParam() ? "4" : "0", 0);
 	C::ent_info_filter = G::Engine.pfnRegisterVariable("ent_info_filter", "", 0);
-	C::mp_noviewpunch = G::Engine.pfnRegisterVariable("mp_noviewpunch", U::App::HasDebugParam() ? "1" : "0", 0);
+	C::noviewpunch = G::Engine.pfnRegisterVariable("noviewpunch", U::App::HasDebugParam() ? "1" : "0", 0);
 
 	// Find & register native stuff
 
@@ -406,4 +483,11 @@ void InitConCmds()
 	G::Engine.pfnAddCommand("god", pfnHost_God_f);
 	G::Engine.pfnAddCommand("notarget", pfnHost_Notarget_f);
 	G::Engine.pfnAddCommand("noclip", pfnHost_Noclip_f);
+
+	// Raw Input
+
+	C::sensitivity = G::Engine.pfnGetCvarPointer("sensitivity");
+	C::m_rawinput = G::Engine.pfnRegisterVariable("m_rawinput", "0", 0);
+	C::m_yaw = G::Engine.pfnGetCvarPointer("m_yaw");
+	C::m_pitch = G::Engine.pfnGetCvarPointer("m_pitch");
 }

@@ -29,7 +29,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -47,10 +47,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName>CrashRpt</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\</IntDir>
+    <TargetName>CrashRpt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -58,18 +60,21 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\vendor\Memoria\Memoria\public;$(ProjectDir)..\vendor\Memoria\vendor\hde\public;$(ProjectDir)..\src;$(ProjectDir)..\vendor;$(ProjectDir)..\vendor\hlsdk\public;$(ProjectDir)..\vendor\hlsdk\common;$(ProjectDir)..\vendor\hlsdk\dlls;$(ProjectDir)..\vendor\hlsdk\extended;$(ProjectDir)..\vendor\hlsdk\engine;$(ProjectDir)..\vendor\hlsdk\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\vendor;$(ProjectDir)..\vendor\hlsdk\public;$(ProjectDir)..\vendor\hlsdk\common;$(ProjectDir)..\vendor\hlsdk\dlls;$(ProjectDir)..\vendor\hlsdk\extended;$(ProjectDir)..\vendor\hlsdk\engine;$(ProjectDir)..\vendor\hlsdk\pm_shared;$(ProjectDir)..\vendor\hde\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <ForcedIncludeFiles>$(ProjectDir)..\vendor\Memoria\Memoria\public\memoria_amalgamation.hpp;$(ProjectDir)..\src\core\config.hpp;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(ProjectDir)..\src\core\config.hpp;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <AdditionalOptions>/Zc:strictStrings- %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4005</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OutDir)Memoria.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>call "$(ProjectDir)..\tools\gen_resource.cmd" "$(ProjectDir)..\resources\resource.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -82,9 +87,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>4005</DisableSpecificWarnings>
       <AdditionalOptions>/Zc:strictStrings- %(AdditionalOptions)</AdditionalOptions>
-      <ForcedIncludeFiles>$(ProjectDir)..\vendor\Memoria\Memoria\public\memoria_amalgamation.hpp;$(ProjectDir)..\src\core\config.hpp;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(ProjectDir)..\src\core\config.hpp;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\vendor\Memoria\Memoria\public;$(ProjectDir)..\vendor\Memoria\vendor\hde\public;$(ProjectDir)..\src;$(ProjectDir)..\vendor;$(ProjectDir)..\vendor\hlsdk\public;$(ProjectDir)..\vendor\hlsdk\common;$(ProjectDir)..\vendor\hlsdk\dlls;$(ProjectDir)..\vendor\hlsdk\extended;$(ProjectDir)..\vendor\hlsdk\engine;$(ProjectDir)..\vendor\hlsdk\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\vendor;$(ProjectDir)..\vendor\hlsdk\public;$(ProjectDir)..\vendor\hlsdk\common;$(ProjectDir)..\vendor\hlsdk\dlls;$(ProjectDir)..\vendor\hlsdk\extended;$(ProjectDir)..\vendor\hlsdk\engine;$(ProjectDir)..\vendor\hlsdk\pm_shared;$(ProjectDir)..\vendor\hde\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -92,24 +97,36 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OutDir)Memoria.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>call "$(ProjectDir)..\tools\gen_resource.cmd" "$(ProjectDir)..\resources\resource.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\common\concmds.cpp" />
     <ClCompile Include="..\src\common\precache.cpp" />
+    <ClCompile Include="..\src\common\rawinput.cpp" />
     <ClCompile Include="..\src\common\simon.cpp" />
     <ClCompile Include="..\src\core\global.cpp" />
     <ClCompile Include="..\src\core\hooks.cpp" />
     <ClCompile Include="..\src\core\main.cpp" />
     <ClCompile Include="..\src\utils\app_utils.cpp" />
     <ClCompile Include="..\src\utils\ent_utils.cpp" />
+    <ClCompile Include="..\src\utils\file_utils.cpp" />
+    <ClCompile Include="..\src\utils\mdl_utils.cpp" />
+    <ClCompile Include="..\src\utils\mem_utils.cpp" />
     <ClCompile Include="..\src\utils\nprintf.cpp" />
     <ClCompile Include="..\src\utils\rendering.cpp" />
+    <ClCompile Include="..\vendor\hde\src\hde32.c" />
+    <ClCompile Include="..\vendor\hde\src\hde64.c" />
+    <ClCompile Include="..\vendor\hde\src\hde_utils.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\resources\resource.h" />
     <ClInclude Include="..\src\common\concmds.hpp" />
     <ClInclude Include="..\src\common\precache.hpp" />
+    <ClInclude Include="..\src\common\rawinput.hpp" />
     <ClInclude Include="..\src\common\simon.h" />
     <ClInclude Include="..\src\core\config.hpp" />
     <ClInclude Include="..\src\core\global.hpp" />
@@ -117,8 +134,20 @@
     <ClInclude Include="..\src\shared\build_number.h" />
     <ClInclude Include="..\src\utils\app_utils.hpp" />
     <ClInclude Include="..\src\utils\ent_utils.hpp" />
+    <ClInclude Include="..\src\utils\file_utils.hpp" />
+    <ClInclude Include="..\src\utils\mdl_utils.hpp" />
+    <ClInclude Include="..\src\utils\mem_utils.hpp" />
     <ClInclude Include="..\src\utils\nprintf.hpp" />
     <ClInclude Include="..\src\utils\rendering.hpp" />
+    <ClInclude Include="..\vendor\hde\public\hde32.h" />
+    <ClInclude Include="..\vendor\hde\public\hde64.h" />
+    <ClInclude Include="..\vendor\hde\public\hde_common.h" />
+    <ClInclude Include="..\vendor\hde\public\hde_utils.h" />
+    <ClInclude Include="..\vendor\hde\public\table32.h" />
+    <ClInclude Include="..\vendor\hde\public\table64.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\resources\MadSimonX.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
