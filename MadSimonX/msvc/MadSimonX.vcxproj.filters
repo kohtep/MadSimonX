@@ -84,6 +84,9 @@
     <ClCompile Include="..\src\utils\file_utils.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\utils\console_utils.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\shared\build_number.h">
@@ -151,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="..\resources\resource.h">
       <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\console_utils.hpp">
+      <Filter>src\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

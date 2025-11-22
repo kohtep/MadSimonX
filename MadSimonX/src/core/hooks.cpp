@@ -12,6 +12,7 @@
 #include "utils/nprintf.hpp"
 #include "utils/mem_utils.hpp"
 #include "utils/file_utils.hpp"
+#include "utils/console_utils.hpp"
 
 #include "common/precache.hpp"
 #include "common/rawinput.hpp"
@@ -132,7 +133,8 @@ static void hkHUD_Frame_Init(double time)
 
 		ApplyHooks();
 
-		G::Engine.Con_Printf("MadSimonX successfully initialized.\n");
+		U::App::AppendWindowTag("MadSimonX");
+		U::Console::Print({ 150, 0, 75}, "| MadSimonX successfully initialized.\n");
 	}
 }
 
@@ -140,7 +142,7 @@ static void hkHUD_Frame(double time)
 {
 	if (*P::cstate == ca_active && !IsInMainMenu())
 	{
-		CSimon::Instance().Think();
+		CSimon::Instance().Update();
 	}
 
 	U::NPrintf::Reset();
@@ -233,7 +235,7 @@ static int hkHUD_Redraw(float Time, int Intermission)
 
 static void hkServerDeactivate()
 {
-	CSimon::Instance().Flush();
+	CSimon::Instance().Reset();
 
 	G::EntityInterface.pfnServerDeactivate();
 }

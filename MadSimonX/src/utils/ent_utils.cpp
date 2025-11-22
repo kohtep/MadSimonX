@@ -30,7 +30,7 @@ void U::Ent::Spawn(const char *name, const Vector &pos)
 
 void U::Ent::Despawn(bool bFullDelete)
 {
-	auto edict = CSimon::Instance().TraceEntity();
+	auto edict = CSimon::Instance().GetViewTraceEntity();
 	if (!edict)
 	{
 		G::Engine.Con_Printf("Could not find entity.\n");
@@ -38,7 +38,7 @@ void U::Ent::Despawn(bool bFullDelete)
 	}
 
 	auto ent = (CBaseEntity *)edict->pvPrivateData;
-	ent->Killed((entvars_t *)&CSimon::Instance().Entity()->v, 0);
+	ent->Killed((entvars_t *)&CSimon::Instance().GetEntity()->v, 0);
 
 	if (bFullDelete)
 		P::UTIL_Remove(ent);

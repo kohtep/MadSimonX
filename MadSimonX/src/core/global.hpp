@@ -47,8 +47,9 @@
 #include "hlsdk/dlls/player.h"
 
 struct IBaseSystem;
+class IFileSystem;
 
-struct IGameUI007
+struct IGameUI
 {
 	virtual void Create(bool Dispose) = 0;
 	virtual bool Initialize(CreateInterfaceFn *factories, int count) = 0;
@@ -93,6 +94,30 @@ struct IGame
 	virtual void SetCursorVisible(bool bState) = 0;
 };
 
+class Color
+{
+public:
+	uint8_t r, g, b;
+
+	Color() : r(0), g(0), b(0) {}
+	Color(uint8_t red, uint8_t green, uint8_t blue)
+		: r(red), g(green), b(blue) {}
+};
+
+class IGameConsole : public IBaseInterface
+{
+public:
+	virtual void Activate(void) = 0;
+	virtual void Initialize(void) = 0;
+	virtual void Hide(void) = 0;
+	virtual void Clear(void) = 0;
+	virtual bool IsConsoleVisible(void) = 0;
+	virtual void Printf(const char *format, ...) = 0;
+	virtual void DPrintf(const char *format, ...) = 0;
+	virtual void ColorPrintf(Color &clr) = 0;
+	virtual void SetParent(int parent) = 0;
+};
+
 // Globals
 namespace G
 {
@@ -118,6 +143,7 @@ namespace M
 	extern U::Memory::module_t &GetModLib(); // hl.dll
 	extern U::Memory::module_t &GetClient(); // client.dll
 	extern U::Memory::module_t &GetGameUI(); // GameUI.dll
+	extern U::Memory::module_t &GetFileSystem(); // filesystem_stdio.dll / filesystem_steam.dll
 }
 
 // Pointers
@@ -169,7 +195,9 @@ namespace P
 	inline edict_s *sv_edicts;
 
 	inline IGame *game;
-	inline IGameUI007 *gameui;
+	inline IFileSystem *filesystem;
+	inline IGameUI *gameui;
+	inline IGameConsole *console;
 
 	inline WNDPROC WndProc;
 

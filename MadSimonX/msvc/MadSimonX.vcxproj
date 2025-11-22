@@ -112,6 +112,7 @@
     <ClCompile Include="..\src\core\hooks.cpp" />
     <ClCompile Include="..\src\core\main.cpp" />
     <ClCompile Include="..\src\utils\app_utils.cpp" />
+    <ClCompile Include="..\src\utils\console_utils.cpp" />
     <ClCompile Include="..\src\utils\ent_utils.cpp" />
     <ClCompile Include="..\src\utils\file_utils.cpp" />
     <ClCompile Include="..\src\utils\mdl_utils.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="..\src\core\hooks.hpp" />
     <ClInclude Include="..\src\shared\build_number.h" />
     <ClInclude Include="..\src\utils\app_utils.hpp" />
+    <ClInclude Include="..\src\utils\console_utils.hpp" />
     <ClInclude Include="..\src\utils\ent_utils.hpp" />
     <ClInclude Include="..\src\utils\file_utils.hpp" />
     <ClInclude Include="..\src\utils\mdl_utils.hpp" />

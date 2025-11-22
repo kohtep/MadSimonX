@@ -6,13 +6,13 @@
 
 static void PrecacheModelSafe(const char *s)
 {
-	if (s && *s && U::File::FileExists(s))
+	if (U::File::FileExists(s))
 		G::Server.pfnPrecacheModel(const_cast<char *>(s));
 }
 
 static void PrecacheSoundSafe(const char *s)
 {
-	if (s && *s && U::File::FileExists(s))
+	if (U::File::FileExists(s))
 		G::Server.pfnPrecacheSound(const_cast<char *>(s));
 }
 
@@ -26,7 +26,7 @@ static void PrecachePills()
 
 	PrecacheSoundSafe("cutscene/smallmedkit1.wav");
 }
-	
+
 static void PrecacheSawrunner()
 {
 	PrecacheModelSafe("models/sawrunner.mdl");
@@ -81,7 +81,7 @@ static void PrecacheRecorder()
 	PrecacheSoundSafe("save/save_sequence.wav");
 }
 
-static void PrecacheCOFTelephone()
+static void PrecachePhone()
 {
 	PrecacheSoundSafe("phone/telephone_button_press.wav");
 	PrecacheSoundSafe("phone/telephone_dial_tone.wav");
@@ -150,7 +150,31 @@ static void PrecachePadlock()
 static void PrecacheG43()
 {
 	PrecacheModelSafe("models/ammo/ammo_g43.mdl");
-	PrecacheSoundSafe("weapons/item_get.wav");
+}
+
+static void PrecacheP345()
+{
+	PrecacheModelSafe("models/ammo/p345_clip.mdl");
+}
+
+static void PrecacheRevolver()
+{
+	PrecacheModelSafe("models/ammo/ammo_revolver.mdl");
+}
+
+static void PrecacheRifle()
+{
+	PrecacheModelSafe("models/ammo/ammo_rifle.mdl");
+}
+
+static void PrecacheM16()
+{
+	PrecacheModelSafe("models/ammo/ammo_m16.mdl");
+}
+
+static void PrecacheVP70()
+{
+	PrecacheModelSafe("models/ammo/vp70_clip.mdl");
 }
 
 static void PrecacheBookSimon()
@@ -161,17 +185,24 @@ static void PrecacheBookSimon()
 
 void Precache()
 {
+	PrecacheSoundSafe("weapons/item_get.wav");
+
 	PrecachePills();
 	PrecacheSawrunner();
 	PrecacheRadio();
 	PrecacheSoda();
 	PrecacheRecorder();
-	PrecacheCOFTelephone();
+	PrecachePhone();
 	PrecacheBattery();
 	PrecacheSuicider();
 	PrecacheTMP();
 	PrecacheNightvision();
 	PrecachePadlock();
 	PrecacheG43();
+	PrecacheP345();
+	PrecacheRifle();
+	PrecacheRevolver();
+	PrecacheM16();
+	PrecacheVP70();
 	PrecacheBookSimon();
 }

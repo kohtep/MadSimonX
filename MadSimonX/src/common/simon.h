@@ -33,15 +33,22 @@ private:
 public:
 	static CSimon &Instance();
 
-	void Think();
-	void Flush();
+	void Update();
+	void Reset();
+
+	bool IsValid() const { return (m_Entity != nullptr); }
 
 	void SetHealth(float value) { if (m_Entity) m_Entity->v.health = value; }
 	float GetHealth() { return m_Entity ? m_Entity->v.health : -1.0f; }
 
-	auto Player() { return m_Player; }
-	auto Entity() { return m_Entity; }
+	auto GetPlayer() { return m_Player; }
+	auto GetEntity() { return m_Entity; }
 
-	Vector TraceEyes();
-	edict_t *TraceEntity();
+	Vector GetEyes() const;
+	Vector GetViewTraceEnd();
+	edict_t *GetViewTraceEntity();
+
+	void GetViewVectors(Vector *forward, Vector *right = nullptr, Vector *up = nullptr) const;
+
+	void GiveItem(const char *item_name);
 };

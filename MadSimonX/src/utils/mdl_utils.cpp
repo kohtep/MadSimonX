@@ -2,10 +2,10 @@
 
 #include "utils/mem_utils.hpp"
 
-#define MEM_NAMESPACE_BEGIN namespace U::Memory {
-#define MEM_NAMESPACE_END }
+#define NAMESPACE_BEGIN namespace U::Memory {
+#define NAMESPACE_END }
 
-MEM_NAMESPACE_BEGIN
+NAMESPACE_BEGIN
 
 static DWORD GetModuleSize(HMODULE handle)
 {
@@ -135,4 +135,4 @@ sighandle_t module_t::Sig()
 	return sighandle_t(this);
 }
 
-MEM_NAMESPACE_END
+NAMESPACE_END

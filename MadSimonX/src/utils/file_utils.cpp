@@ -2,15 +2,21 @@
 
 #include <Windows.h>
 
-#define FILE_NAMESPACE_BEGIN namespace U::File {
-#define FILE_NAMESPACE_END }
+#include "hlsdk/public/FileSystem.h"
 
-FILE_NAMESPACE_BEGIN
+#include "core/global.hpp"
+
+#define NAMESPACE_BEGIN namespace U::File {
+#define NAMESPACE_END }
+
+NAMESPACE_BEGIN
 
 bool FileExists(const char *path)
 {
-    DWORD attr = GetFileAttributesA(path);
-    return (attr != INVALID_FILE_ATTRIBUTES && !(attr & FILE_ATTRIBUTE_DIRECTORY));
+	if (!path || !*path)
+		return false;
+
+	return P::filesystem->FileExists(path);
 }
 
-FILE_NAMESPACE_END
+NAMESPACE_END

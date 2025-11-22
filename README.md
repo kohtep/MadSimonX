@@ -62,15 +62,17 @@ A full list of available commands is provided below.
 | `ent_info_filter` | Displays only entities with the specified name. |
 | `give` | Gives the player an item. Example: `weapon_rifle`. |
 | `hurtme` | Deals damage to the player. |
-| `madsimon` | Displays product information. |
-| `nofear` | If I'm not mistaken, this command disables Simon's breathing during the forest scene. |
-| `infinite_stamina` | Infinite stamina. |
-| `infinite_health` | Infinite health. |
-| `infinite_ammo` | Infinite ammo. |
+| `smn_about` | Displays product information. |
+| `smn_kohtep` | Personal debugging function for granting a favorite weapon. |
+| `smn_kohtep2` | Personal debugging function for dropping weapons, items, and ammunition in front of the player. |
+| `smn_nofear` | If I'm not mistaken, this command disables Simon's breathing during the forest scene. |
+| `smn_showinfo` | Displays various debugging information about the game world. |
+| `smn_infinite_stamina` | Infinite stamina. |
+| `smn_infinite_health` | Infinite health. |
+| `smn_infinite_ammo` | Infinite ammo. |
+| `smn_noviewpunch` | Disables view shaking. |
+| `smn_always_first_deploy` | Always plays the first-time weapon draw animation. I liked how it looked and enjoyed watching it. |
 | `hud_nprintf_time` | Sets the duration (in seconds) for how long `nprintf` info is displayed on screen. |
-| `noviewpunch` | Disables view shaking. |
-| `always_first_deploy` | Always plays the first-time weapon draw animation. I liked how it looked and enjoyed watching it. |
-| `simon_showinfo` | Displays various debugging information about the game world. |
 | `m_rawinput` | **MadSimon** implements the `m_rawinput` variable for Cry of Fear. The behavior is the same as in other GoldSource games. |
 
 ## How to Use

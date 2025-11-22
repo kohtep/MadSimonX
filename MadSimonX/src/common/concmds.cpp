@@ -6,12 +6,13 @@
 
 #include "utils/ent_utils.hpp"
 #include "utils/app_utils.hpp"
+#include "utils/console_utils.hpp"
 
 // Cut Cmds
 
 static void pfnHost_God_f()
 {
-	auto ent = CSimon::Instance().Entity();
+	auto ent = CSimon::Instance().GetEntity();
 	if (!ent)
 		return;
 
@@ -26,7 +27,7 @@ static void pfnHost_God_f()
 
 static void pfnHost_Notarget_f()
 {
-	auto ent = CSimon::Instance().Entity();
+	auto ent = CSimon::Instance().GetEntity();
 	if (!ent)
 		return;
 
@@ -41,7 +42,7 @@ static void pfnHost_Notarget_f()
 
 static void pfnHost_Noclip_f()
 {
-	auto ent = CSimon::Instance().Entity();
+	auto ent = CSimon::Instance().GetEntity();
 	if (!ent)
 		return;
 
@@ -147,51 +148,27 @@ static void Cmd_Find_f()
 
 static void Entity_Create_f()
 {
-	if (C::sv_cheats->value <= 0.0f)
-	{
-		G::Engine.Con_Printf("Can't use cheat command with disabled sv_cheats value.\n");
-		return;
-	}
-
 	if (G::Engine.Cmd_Argc() < 2)
 	{
 		G::Engine.Con_Printf("Syntax: %s <Name>\n", G::Engine.Cmd_Argv(0));
 		return;
 	}
 
-	U::Ent::Spawn(G::Engine.Cmd_Argv(1), CSimon::Instance().TraceEyes());
+	U::Ent::Spawn(G::Engine.Cmd_Argv(1), CSimon::Instance().GetViewTraceEnd());
 }
 
 static void Entity_Remove_f()
 {
-	if (C::sv_cheats->value <= 0.0f)
-	{
-		G::Engine.Con_Printf("Can't use cheat command with disabled sv_cheats value.\n");
-		return;
-	}
-
 	U::Ent::Despawn(true);
 }
 
 static void Entity_Killed_f()
 {
-	if (C::sv_cheats->value <= 0.0f)
-	{
-		G::Engine.Con_Printf("Can't use cheat command with disabled sv_cheats value.\n");
-		return;
-	}
-
 	U::Ent::Despawn(false);
 }
 
 static void Entity_SetName_f()
 {
-	if (C::sv_cheats->value <= 0.0f)
-	{
-		G::Engine.Con_Printf("Can't use cheat command with disabled sv_cheats value.\n");
-		return;
-	}
-
 	if (G::Engine.Cmd_Argc() < 2)
 	{
 		G::Engine.Con_Printf("Syntax: %s <Name>\n", G::Engine.Cmd_Argv(0));
@@ -205,7 +182,7 @@ static void Entity_SetName_f()
 		return;
 	}
 
-	auto edict = CSimon::Instance().TraceEntity();
+	auto edict = CSimon::Instance().GetViewTraceEntity();
 	if (!edict)
 	{
 		G::Engine.Con_Printf("Could not find entity.\n");
@@ -218,7 +195,7 @@ static void Entity_SetName_f()
 
 static void Entity_GetName_f()
 {
-	auto ent = CSimon::Instance().TraceEntity();
+	auto ent = CSimon::Instance().GetViewTraceEntity();
 	if (!ent)
 	{
 		G::Engine.Con_Printf("Could not find entity.\n");
@@ -283,6 +260,102 @@ static void Cmd_FindEnts_f()
 	U::Ent::Enumerate(pfn, nullptr);
 }
 
+struct SpawnOffsets_t
+{
+	int weapon_offset;
+	int ammo_offset;
+	int item_offset;
+};
+
+struct SpawnGameStuffContext_t
+{
+	SpawnOffsets_t offsets;
+
+	Vector eyes;
+	Vector forward;
+	Vector right;
+	Vector up;
+
+	float baseDist;
+	float stepDist;
+	float heightOffset;
+	float weaponSideOffset;
+	float ammoSideOffset;
+	float itemSideOffset;
+};
+
+static bool SpawnGameStuff_EnumerCallback(const char *name, void *addr, void *table_addr, void *arg)
+{
+	SpawnGameStuffContext_t *ctx = (SpawnGameStuffContext_t *)arg;
+	SpawnOffsets_t &offsets = ctx->offsets;
+
+	if (!strncmp(name, "weapon_", 7) &&
+		strcmp(name, "weapon_dualweapon") &&
+		strcmp(name, "weapon_action"))
+	{
+		float dist = ctx->baseDist + offsets.weapon_offset * ctx->stepDist;
+
+		Vector pos = ctx->eyes
+			+ ctx->forward * dist
+			+ ctx->right * ctx->weaponSideOffset
+			+ ctx->up * ctx->heightOffset;
+
+		U::Ent::Spawn(name, pos);
+
+		offsets.weapon_offset++;
+
+		return true;
+	}
+
+	if (!strncmp(name, "ammo_", 5))
+	{
+		if (!strcmp(name, "ammo_flashlightbattery") ||
+			!strcmp(name, "ammo_mp5"))
+			return true;
+
+		float dist = ctx->baseDist + offsets.ammo_offset * ctx->stepDist;
+
+		Vector pos = ctx->eyes
+			+ ctx->forward * dist
+			+ ctx->right * ctx->ammoSideOffset
+			+ ctx->up * ctx->heightOffset;
+
+		U::Ent::Spawn(name, pos);
+
+		offsets.ammo_offset++;
+
+		return true;
+	}
+
+	if (!strncmp(name, "item_", 5))
+	{
+		if (!strcmp(name, "item_suit") ||
+			!strcmp(name, "item_battery") ||
+			!strcmp(name, "item_security") ||
+			!strcmp(name, "item_longjump") ||
+			!strcmp(name, "item_antidote") ||
+			!strcmp(name, "item_sodacan") ||
+			!strcmp(name, "item_padlock") ||
+			!strcmp(name, "item_armour"))
+			return true;
+
+		float dist = ctx->baseDist + offsets.item_offset * ctx->stepDist;
+
+		Vector pos = ctx->eyes
+			+ ctx->forward * dist
+			+ ctx->right * ctx->itemSideOffset
+			+ ctx->up * ctx->heightOffset;
+
+		U::Ent::Spawn(name, pos);
+
+		offsets.item_offset++;
+
+		return true;
+	}
+
+	return true;
+}
+
 static void Cmd_SpawnGameStuff_f()
 {
 	if (*P::cstate != ca_active)
@@ -291,142 +364,118 @@ static void Cmd_SpawnGameStuff_f()
 		return;
 	}
 
-	struct offsets_t
-	{
-		int weapon_offset;
-		int ammo_offset;
-		int item_offset;
-	} offsets;
+	CSimon &simon = CSimon::Instance();
 
-	offsets.weapon_offset = 0;
-	offsets.ammo_offset = 0;
-	offsets.item_offset = 0;
+	if (!simon.IsValid())
+		return;
 
-	auto pfn = [](const char *name, void *func, void *func_table, void *arg) -> bool
-		{
-			offsets_t *offsets = (offsets_t *)arg;
+	SpawnGameStuffContext_t ctx;
+	ctx.offsets.weapon_offset = 0;
+	ctx.offsets.ammo_offset = 0;
+	ctx.offsets.item_offset = 0;
 
-			if (!strncmp(name, "weapon_", 7) && strcmp(name, "weapon_dualweapon") && strcmp(name, "weapon_action"))
-			{
-				float offset = (offsets->weapon_offset) * 28.0f;
-				Vector pos = CSimon::Instance().TraceEyes() + Vector(offset, 0.0f, 32.0f);
-				U::Ent::Spawn(name, pos);
+	ctx.eyes = simon.GetEyes();
+	simon.GetViewVectors(&ctx.forward, &ctx.right, &ctx.up);
 
-				offsets->weapon_offset++;
+	ctx.baseDist = 64.0f;
+	ctx.stepDist = 28.0f;
+	ctx.heightOffset = 32.0f;
 
-				return true;
-			}
+	const float rowSpacing = 64.0f;
 
-			if (!strncmp(name, "ammo_", 5))
-			{
-				if (!strcmp(name, "ammo_flashlightbattery") ||
-					!strcmp(name, "ammo_mp5"))
-					return true;
+	ctx.ammoSideOffset = 0.0f;
+	ctx.weaponSideOffset = rowSpacing;
+	ctx.itemSideOffset = -rowSpacing;
 
-				float offset = (offsets->ammo_offset) * 28.0f;
-				Vector pos = CSimon::Instance().TraceEyes() + Vector(offset, -64.0f, 32.0f);
-				U::Ent::Spawn(name, pos);
-
-				offsets->ammo_offset++;
-
-				return true;
-			}
-
-			if (!strncmp(name, "item_", 5))
-			{
-				if (!strcmp(name, "item_suit") ||
-					!strcmp(name, "item_battery") ||
-					!strcmp(name, "item_security") ||
-					!strcmp(name, "item_longjump") ||
-					!strcmp(name, "item_antidote") ||
-					!strcmp(name, "item_sodacan") ||
-					!strcmp(name, "item_padlock") ||
-					!strcmp(name, "item_armour"))
-					return true;
-
-				float offset = (offsets->item_offset) * 28.0f;
-				Vector pos = CSimon::Instance().TraceEyes() + Vector(offset, -128.0f, 32.0f);
-				U::Ent::Spawn(name, pos);
-
-				offsets->item_offset++;
-
-				return true;
-			}
-
-			return true;
-		};
-
-	U::Ent::Enumerate(pfn, &offsets);
+	U::Ent::Enumerate(SpawnGameStuff_EnumerCallback, &ctx);
 }
 
 static void Cmd_SpawnKohtepSet_f()
 {
-	auto GiveNamedItemToMe = [](const char *name) -> void
-		{
-			P::GiveNamedItem(CSimon::Instance().Player(), 0, name, false, false);
-		};
-
-	GiveNamedItemToMe("item_nightvision");
-
-	GiveNamedItemToMe("weapon_p345");
-	GiveNamedItemToMe("weapon_rifle");
-
-	GiveNamedItemToMe("weapon_g43");
-	GiveNamedItemToMe("weapon_nightstick");
-
-	GiveNamedItemToMe("ammo_p345");
-	GiveNamedItemToMe("ammo_p345");
-	GiveNamedItemToMe("ammo_p345");
-	GiveNamedItemToMe("ammo_p345");
-	GiveNamedItemToMe("ammo_rifle");
-	GiveNamedItemToMe("ammo_rifle");
-	GiveNamedItemToMe("ammo_rifle");
-	GiveNamedItemToMe("ammo_rifle");
-	GiveNamedItemToMe("ammo_g43");
-	GiveNamedItemToMe("ammo_g43");
-	GiveNamedItemToMe("ammo_g43");
-	GiveNamedItemToMe("ammo_g43");
-
-	if (G::Engine.Cmd_Argc() > 1 && *G::Engine.Cmd_Argv(1) == '1')
+	if (*P::cstate != ca_active)
 	{
-		G::Engine.pfnClientCmd("quickselset1 1; quickselset2 2; quickselset3 3");
+		G::Engine.Con_Printf("Can't %s, not connected\n", G::Engine.Cmd_Argv(0));
+		return;
 	}
+
+	CSimon &simon = CSimon::Instance();
+
+	if (!simon.IsValid())
+		return;
+
+	simon.GiveItem("weapon_p345");
+	simon.GiveItem("weapon_rifle");
+
+	simon.GiveItem("weapon_g43");
+	simon.GiveItem("weapon_nightstick");
+
+	simon.GiveItem("ammo_p345");
+	simon.GiveItem("ammo_p345");
+	simon.GiveItem("ammo_p345");
+	simon.GiveItem("ammo_p345");
+	simon.GiveItem("ammo_rifle");
+	simon.GiveItem("ammo_rifle");
+	simon.GiveItem("ammo_rifle");
+	simon.GiveItem("ammo_rifle");
+	simon.GiveItem("ammo_g43");
+	simon.GiveItem("ammo_g43");
+	simon.GiveItem("ammo_g43");
+	simon.GiveItem("ammo_g43");
+
+	G::Engine.pfnClientCmd("quickselset1 1; quickselset2 2; quickselset3 3; inventoryequip 2");
 }
 
 static void Cmd_Give_f()
 {
-	if (C::sv_cheats->value <= 0.0f)
-	{
-		G::Engine.Con_Printf("Can't use cheat command with disabled sv_cheats value.\n");
-		return;
-	}
-
 	if (G::Engine.Cmd_Argc() < 2)
 	{
 		G::Engine.Con_Printf("Syntax: %s <Item Name>\n", G::Engine.Cmd_Argv(0));
 		return;
 	}
 
-	P::GiveNamedItem(CSimon::Instance().Player(), 0, G::Engine.Cmd_Argv(1), false, false);
+	P::GiveNamedItem(CSimon::Instance().GetPlayer(), 0, G::Engine.Cmd_Argv(1), false, false);
 }
+
+static const Color COL_FRAME(160, 160, 160);
+static const Color COL_TITLE(255, 220, 50);
+static const Color COL_SUBTITLE(150, 200, 255);
+static const Color COL_TEXT(220, 220, 220);
+static const Color COL_SECTION(255, 180, 80);
+static const Color COL_BULLET(255, 120, 120);
+static const Color COL_LABEL(180, 220, 180);
 
 static void Cmd_About_f()
 {
-	G::Engine.Con_Printf("MadSimonX - A debugging environment builder for the Cry of Fear mod.\n");
-	G::Engine.Con_Printf("Developed by Aleksandr B. aka kohtep\n");
-	G::Engine.Con_Printf("\n");
-	G::Engine.Con_Printf("Github: https://github.com/kohtep\n");
-	G::Engine.Con_Printf("Steam: https://steamcommunity.com/profiles/76561198045711038\n");
+	U::Console::Print(COL_FRAME, "====================================================\n");
+
+	U::Console::Print(COL_FRAME, "| ");
+	U::Console::Print(COL_TITLE, "MadSimonX");
+	U::Console::Print(COL_FRAME, " - ");
+	U::Console::Print(COL_SUBTITLE, "Cry of Fear Mod Extensions\n");
+
+	U::Console::Print(COL_FRAME, "| ");
+	U::Console::Print(COL_TEXT, "Developed by Aleksandr B. (aka kohtep)\n");
+
+	U::Console::Print(COL_FRAME, "|----------------------------------------------------\n");
+
+	U::Console::Print(COL_FRAME, "| ");
+	U::Console::Print(COL_SECTION, "Links:\n");
+
+	U::Console::Print(COL_FRAME, "|   ");
+	U::Console::Print(COL_BULLET, "* ");
+	U::Console::Print(COL_LABEL, "GitHub: ");
+	U::Console::Print("https://github.com/kohtep\n");
+
+	U::Console::Print(COL_FRAME, "|   ");
+	U::Console::Print(COL_BULLET, "* ");
+	U::Console::Print(COL_LABEL, "Steam: ");
+	U::Console::Print("https://steamcommunity.com/profiles/76561198045711038\n");
+
+	U::Console::Print(COL_FRAME, "====================================================\n");
 }
 
 static void Cmd_HurtMe_f()
 {
-	if (C::sv_cheats->value <= 0.0f)
-	{
-		G::Engine.Con_Printf("Can't use cheat command with disabled sv_cheats value.\n");
-		return;
-	}
-
 	if (G::Engine.Cmd_Argc() < 2)
 	{
 		G::Engine.Con_Printf("Syntax: %s <Damage>\n", G::Engine.Cmd_Argv(0));
@@ -440,9 +489,9 @@ static void Cmd_HurtMe_f()
 	G::Engine.Con_DPrintf("Your health is now %0.f.\n", CSimon::Instance().GetHealth());
 }
 
-void Simon_Balls_Out_f()
+void Cmd_Simon_Balls_Out_f()
 {
-	CSimon::Instance().Player()->m_bScaredBreathing = false;
+	CSimon::Instance().GetPlayer()->m_bScaredBreathing = false;
 }
 
 void InitConCmds()
@@ -461,20 +510,24 @@ void InitConCmds()
 	G::Engine.pfnAddCommand("give", Cmd_Give_f);
 	G::Engine.pfnAddCommand("hurtme", Cmd_HurtMe_f);
 
-	G::Engine.pfnAddCommand("madsimon", Cmd_About_f);
-	G::Engine.pfnAddCommand("nofear", Simon_Balls_Out_f);
+	G::Engine.pfnAddCommand("smn_kohtep2", Cmd_SpawnGameStuff_f);
+	G::Engine.pfnAddCommand("smn_kohtep", Cmd_SpawnKohtepSet_f);
+	G::Engine.pfnAddCommand("smn_nofear", Cmd_Simon_Balls_Out_f);
+	G::Engine.pfnAddCommand("smn_about", Cmd_About_f);
 
 	// Register MadSimon CVars
 
-	C::always_first_deploy = G::Engine.pfnRegisterVariable("always_first_deploy", "0", 0);
-	C::infinite_stamina = G::Engine.pfnRegisterVariable("infinite_stamina", U::App::HasDebugParam() ? "1" : "0", 0);
-	C::infinite_health = G::Engine.pfnRegisterVariable("infinite_health", U::App::HasDebugParam() ? "1" : "0", 0);
-	C::infinite_ammo = G::Engine.pfnRegisterVariable("infinite_ammo", U::App::HasDebugParam() ? "1" : "0", 0);
 	C::nprintf_time = G::Engine.pfnRegisterVariable("hud_nprintf_time", "4", 0);
-	C::ent_info = G::Engine.pfnRegisterVariable("ent_info", U::App::HasDebugParam() ? "1" : "0", 0);
-	C::ent_info_type = G::Engine.pfnRegisterVariable("ent_info_type", U::App::HasDebugParam() ? "4" : "0", 0);
+
+	C::ent_info = G::Engine.pfnRegisterVariable("ent_info", "0", 0);
 	C::ent_info_filter = G::Engine.pfnRegisterVariable("ent_info_filter", "", 0);
-	C::noviewpunch = G::Engine.pfnRegisterVariable("noviewpunch", U::App::HasDebugParam() ? "1" : "0", 0);
+	C::ent_info_type = G::Engine.pfnRegisterVariable("ent_info_type", "0", 0);
+
+	C::always_first_deploy = G::Engine.pfnRegisterVariable("smn_always_first_deploy", "0", 0);
+	C::infinite_stamina = G::Engine.pfnRegisterVariable("smn_infinite_stamina", "0", 0);
+	C::infinite_health = G::Engine.pfnRegisterVariable("smn_infinite_health", "0", 0);
+	C::infinite_ammo = G::Engine.pfnRegisterVariable("smn_infinite_ammo", "0", 0);
+	C::noviewpunch = G::Engine.pfnRegisterVariable("smn_noviewpunch", "0", 0);
 
 	// Find & register native stuff
 

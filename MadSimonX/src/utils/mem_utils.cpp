@@ -8,10 +8,10 @@
 
 using FindMemoryCmp_t = bool(*)(const void *addr1, const void *addr2, size_t size, void *param);
 
-#define MEM_NAMESPACE_BEGIN namespace U::Memory {
-#define MEM_NAMESPACE_END }
+#define NAMESPACE_BEGIN namespace U::Memory {
+#define NAMESPACE_END }
 
-MEM_NAMESPACE_BEGIN
+NAMESPACE_BEGIN
 
 bool IsInBounds(uintptr_t addr, uintptr_t addr_lower, uintptr_t addr_upper)
 {
@@ -382,7 +382,7 @@ bool SpliceAPI(const char *modname, const char *funcname, void *jump_to, void *o
 	if (!h)
 		return false;
 
-	FARPROC f = GetProcAddress(h, "GetCursorPos");
+	FARPROC f = GetProcAddress(h, funcname);
 	if (!f)
 		return false;
 
@@ -525,4 +525,4 @@ bool RestoreMemoryBackups()
 	return true;
 }
 
-MEM_NAMESPACE_END
+NAMESPACE_END

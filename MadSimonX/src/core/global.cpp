@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <memory>
 
+#include "utils/app_utils.hpp"
+
 HINSTANCE G::Instance;
 
 cl_enginefunc_t G::Engine;
@@ -14,6 +16,7 @@ static U::Memory::module_t gEngine;
 static U::Memory::module_t gModLib;
 static U::Memory::module_t gClientLib;
 static U::Memory::module_t gGameUI;
+static U::Memory::module_t gFileSystem;
 
 U::Memory::module_t &M::GetEngine()
 {
@@ -37,6 +40,12 @@ U::Memory::module_t &M::GetGameUI()
 {
 	assert(gGameUI.Handle && "GameUI library is not ready yet. Please review the caller's logic.");
 	return gGameUI;
+}
+
+U::Memory::module_t &M::GetFileSystem()
+{
+	assert(gFileSystem.Handle && "FileSystem library is not ready yet. Please review the caller's logic.");
+	return gFileSystem;
 }
 
 #define SET_PTR(var, moduleFunc, offset) \
@@ -74,6 +83,11 @@ void InitGlobals()
 	std::construct_at(&gClientLib, "client.dll");
 	std::construct_at(&gGameUI, "GameUI.dll");
 
+	if (U::App::HasCommandLineParam("-steam"))
+		std::construct_at(&gFileSystem, "filesystem_steam.dll");
+	else
+		std::construct_at(&gFileSystem, "filesystem_stdio.dll");
+
 	SET_PTR(P::UTIL_FindEntityByString, GetModLib, 0x118480);
 	SET_PTR(P::GiveNamedItem, GetModLib, 0xE0A80);
 	SET_PTR(P::UTIL_ScreenShake, GetModLib, 0x119DE0);
@@ -104,6 +118,8 @@ void InitGlobals()
 	SET_DEREF_PTR(P::game, GetEngine, 0x1D08CC);
 
 	SET_IFACE(P::gameui, GetGameUI, "GameUI007");
+	SET_IFACE(P::filesystem, GetFileSystem, "VFileSystem009");
+	SET_IFACE(P::console, GetGameUI, "GameConsole003");
 
 	memcpy(&G::Engine, P::Engine, sizeof(G::Engine));
 	memcpy(&G::Server, P::Server, sizeof(G::Server));

@@ -7,6 +7,26 @@
 
 using namespace G;
 
+static edict_t *ENT(entvars_t *pev)
+{
+	if (pev->pContainingEntity)
+		return (edict_t *)pev->pContainingEntity;
+	else
+	{
+		Server.pfnAlertMessage(at_console, "entvars_t pContainingEntity is NULL, calling into engine\n");
+
+		auto pent = Server.pfnFindEntityByVars((entvars_t *)pev);
+		if (pent)
+		{
+			pev->pContainingEntity = (edict_t *)pent;
+			return (edict_t *)pent;
+		}
+
+		Server.pfnAlertMessage(at_console, "DAMN!  Even the engine couldn't FindEntityByVars!\n");
+		return nullptr;
+	}
+}
+
 class CCofComputer : public CBaseEntity
 {
 public:
@@ -107,7 +127,7 @@ CSimon::CSimon()
 	m_ShowInfo = nullptr;
 }
 
-void CSimon::Think()
+void CSimon::Update()
 {
 	//
 	// Before real thinking we must find all Simon's stuff.
@@ -119,7 +139,7 @@ void CSimon::Think()
 
 	if (!m_ShowInfo)
 	{
-		m_ShowInfo = Engine.pfnRegisterVariable("simon_showinfo", "1", 0);
+		m_ShowInfo = Engine.pfnRegisterVariable("smn_showinfo", "1", 0);
 	}
 
 	//
@@ -198,13 +218,13 @@ void CSimon::Think()
 	}
 }
 
-void CSimon::Flush()
+void CSimon::Reset()
 {
 	m_Entity = nullptr;
 	m_Player = nullptr;
 }
 
-Vector CSimon::TraceEyes()
+Vector CSimon::GetViewTraceEnd()
 {
 	Vector forward;
 	Engine.pfnAngleVectors(m_Angles, forward, nullptr, nullptr);
@@ -216,27 +236,7 @@ Vector CSimon::TraceEyes()
 	return tr.endpos;
 }
 
-edict_t *ENT(entvars_t *pev)
-{
-	if (pev->pContainingEntity)
-		return (edict_t *)pev->pContainingEntity;
-	else
-	{
-		Server.pfnAlertMessage(at_console, "entvars_t pContainingEntity is NULL, calling into engine\n");
-
-		auto pent = Server.pfnFindEntityByVars((entvars_t *)pev);
-		if (pent)
-		{
-			pev->pContainingEntity = (edict_t *)pent;
-			return (edict_t *)pent;
-		}		
-
-		Server.pfnAlertMessage(at_console, "DAMN!  Even the engine couldn't FindEntityByVars!\n");
-		return nullptr;
-	}
-}
-
-edict_t *CSimon::TraceEntity()
+edict_t *CSimon::GetViewTraceEntity()
 {
 	Vector forward;
 	Engine.pfnAngleVectors(m_Angles, forward, nullptr, nullptr);
@@ -254,6 +254,24 @@ edict_t *CSimon::TraceEntity()
 		return nullptr;
 
 	return (edict_t *)tr.pHit;
+}
+
+void CSimon::GiveItem(const char *item_name)
+{
+	P::GiveNamedItem(m_Player, 0, item_name, false, false);
+}
+
+Vector CSimon::GetEyes() const
+{
+	return m_Eyes;
+}
+
+void CSimon::GetViewVectors(Vector *forward, Vector *right, Vector *up) const
+{
+	Engine.pfnAngleVectors(m_Angles, 
+		reinterpret_cast<float *>(forward), 
+		reinterpret_cast<float *>(right), 
+		reinterpret_cast<float *>(up));
 }
 
 CSimon &CSimon::Instance()
