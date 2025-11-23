@@ -70,7 +70,8 @@ A full list of available commands is provided below.
 | `smn_infinite_stamina` | Infinite stamina. |
 | `smn_infinite_health` | Infinite health. |
 | `smn_infinite_ammo` | Infinite ammo. |
-| `smn_noviewpunch` | Disables view shaking. |
+| `smn_noviewpunch` | Disables view shaking, including camera shake from jumping or side dashing. |
+| `smn_bhop` | When set to `1`, enables bunny hopping. |
 | `smn_always_first_deploy` | Always plays the first-time weapon draw animation. I liked how it looked and enjoyed watching it. |
 | `hud_nprintf_time` | Sets the duration (in seconds) for how long `nprintf` info is displayed on screen. |
 | `m_rawinput` | **MadSimon** implements the `m_rawinput` variable for Cry of Fear. The behavior is the same as in other GoldSource games. |
