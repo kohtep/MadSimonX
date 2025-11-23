@@ -36,7 +36,6 @@ After all, it's a nice addition to the portfolio, isn't it?
 
 The original **MadSimon** included various experimental functions I created to test the engine, as well as features such as:
 
-* Disabling speed slowdown while bunnyhopping
 * Console commands for manipulating entities and the player character
 * Unlocking **noclip**, **god**, and **notarget** modes
 * Real-time debugging information about entities
@@ -44,12 +43,10 @@ The original **MadSimon** included various experimental functions I created to t
 
 The rewritten version of **MadSimon** also introduces additional features, such as:
 
-* Raw Input for the mouse (m_rawinput 1; experimental feature)
+* Bunnyhopping while holding the jump key without losing speed
+* Classic GoldSource-style raw mouse input
 
 ## Console Commands maybe?
-
-Sure thing. For convenient control, it's best to use the engine's built-in API rather than reinventing your own system.  
-A full list of available commands is provided below.
 
 | Command / CVar | Description |
 |-----------------|-------------|
