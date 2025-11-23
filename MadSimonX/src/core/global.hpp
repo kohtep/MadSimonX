@@ -46,6 +46,8 @@
 #include "hlsdk/dlls/weapons.h"
 #include "hlsdk/dlls/player.h"
 
+#include "hlsdk/cl_dll/kbutton.h"
+
 struct IBaseSystem;
 class IFileSystem;
 
@@ -203,6 +205,10 @@ namespace P
 
 	inline int *mx_accum;
 	inline int *my_accum;
+
+	inline qboolean *key_dest; // Equals '1' if the chat input field is active
+
+	inline kbutton_t *in_jump;
 }
 
 extern void InitCoreGlobals();

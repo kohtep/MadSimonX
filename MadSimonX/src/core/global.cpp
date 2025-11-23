@@ -127,4 +127,7 @@ void InitGlobals()
 
 	SET_PTR(P::mx_accum, GetClient, 0x543580);
 	SET_PTR(P::my_accum, GetClient, 0x543584);
+
+	SET_PTR(P::in_jump, GetClient, 0x54348C);
+	SET_PTR(P::key_dest, GetEngine, 0x6CA258);
 }

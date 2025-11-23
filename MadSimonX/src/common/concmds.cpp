@@ -528,6 +528,8 @@ void InitConCmds()
 	C::infinite_health = G::Engine.pfnRegisterVariable("smn_infinite_health", "0", 0);
 	C::infinite_ammo = G::Engine.pfnRegisterVariable("smn_infinite_ammo", "0", 0);
 	C::noviewpunch = G::Engine.pfnRegisterVariable("smn_noviewpunch", "0", 0);
+	C::bhop = G::Engine.pfnRegisterVariable("smn_bhop", "0", 0);
+	C::show_info = G::Engine.pfnRegisterVariable("smn_showinfo", "1", 0);
 
 	// Find & register native stuff
 

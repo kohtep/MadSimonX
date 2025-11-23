@@ -311,6 +311,36 @@ static DWORD CALLBACK hkWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 	return CallWindowProc(P::WndProc, hwnd, msg, wParam, lParam);
 }
 
+static void ProcessBunnyHop(usercmd_t *cmd)
+{
+	if (!C::bhop || C::bhop->value <= 0.0f)
+		return;
+
+	if (*P::key_dest == 1)
+		return;
+
+	if (!(P::in_jump->state & 1))
+		return;
+
+	const CSimon &me = CSimon::Instance();
+
+	if ((me.GetHeight() >= 2.0f || !me.IsOnGround()) && !me.IsSwimming())
+	{
+		cmd->buttons &= ~IN_JUMP;
+	}
+	else
+	{
+		cmd->buttons |= IN_JUMP;
+	}
+}
+
+static void hkCL_CreateMove(float frametime, usercmd_t *cmd, bool active)
+{
+	G::Client.pCL_CreateMove(frametime, cmd, active);
+
+	ProcessBunnyHop(cmd);
+}
+
 void BackupOriginalCode()
 {
 	U::Memory::CreateMemoryBackup(P::Engine, sizeof(*P::Engine));
@@ -333,7 +363,7 @@ void RestoreHooks()
 		// and there is no point in trying to modify the game window in any way.
 
 		SetWindowLongPtr(P::game->GetMainWindow(), GWL_WNDPROC, (LONG)P::WndProc);
-		DisableRawInputForWindow(P::game->GetMainWindow());
+		ToggleRawInputForWindow(P::game->GetMainWindow(), false);
 	}
 
 	U::Memory::RestoreMemoryBackups();
@@ -355,6 +385,8 @@ void ApplyHooks()
 
 	U::Memory::WritePointer(&P::Client->pHudFrame, hkHUD_Frame);
 	U::Memory::WritePointer(&P::Client->pHudRedrawFunc, hkHUD_Redraw);
+	U::Memory::WritePointer(&P::Client->pCL_CreateMove, hkCL_CreateMove);
+
 	U::Memory::WritePointer(&P::EntityInterface->pfnServerDeactivate, hkServerDeactivate);
 
 	U::Memory::Splice(P::ViewPunch, hkCBasePlayer_ViewPunch, &orgCBasePlayer_ViewPunch, false);
@@ -376,5 +408,5 @@ void ApplyHooks()
 
 	P::WndProc = (WNDPROC)SetWindowLongPtr(P::game->GetMainWindow(), GWL_WNDPROC, (LONG)hkWndProc);
 	U::Memory::SpliceAPI("USER32.dll", "GetCursorPos", hkGetCursorPos, &orgGetCursorPos, false);
-	EnableRawInputForWindow(P::game->GetMainWindow());
+	ToggleRawInputForWindow(P::game->GetMainWindow(), true);
 }

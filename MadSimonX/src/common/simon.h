@@ -12,23 +12,19 @@ class CSimon
 	CSimon &operator=(CSimon &&other) noexcept = default;
 
 private:
-	edict_t *m_Entity;
-	CBasePlayer *m_Player;
+	edict_t *_entity;
+	CBasePlayer *_player;
 
-	Vector m_Eyes;
+	Vector _eyes;
 
-	Vector m_Origin;
-	Vector m_Angles;
+	Vector _origin;
+	Vector _angles;
 
-	cvar_t *m_ShowInfo;
+	float _height;
 
 private:
-	void DebugHeader();
-	void DebugSimon();
-	void DebugWeapon();
-	void DebugMap();
-	void DebugThisDude();
-	void DebugComputer();
+	void CalcGroundDistance();
+	void PrintDebugInfo();
 
 public:
 	static CSimon &Instance();
@@ -36,13 +32,17 @@ public:
 	void Update();
 	void Reset();
 
-	bool IsValid() const { return (m_Entity != nullptr); }
+	bool IsValid() const { return (_entity != nullptr); }
+	bool IsOnGround() const;
+	bool IsSwimming() const;
 
-	void SetHealth(float value) { if (m_Entity) m_Entity->v.health = value; }
-	float GetHealth() { return m_Entity ? m_Entity->v.health : -1.0f; }
+	void SetHealth(float value);
 
-	auto GetPlayer() { return m_Player; }
-	auto GetEntity() { return m_Entity; }
+	float GetHealth() const;
+	float GetHeight() const;
+
+	CBasePlayer *GetPlayer() const;
+	edict_t *GetEntity() const;
 
 	Vector GetEyes() const;
 	Vector GetViewTraceEnd();
