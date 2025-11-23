@@ -4,6 +4,10 @@ A debugging environment builder for the **Cry of Fear** mod.
 
 ## More Details
 
+<p align="center">
+  <img src="https://github.com/kohtep/kohtep/blob/main/resources/shared/cof-msx-preview.jpg" alt="Header Image">
+</p>
+
 **MadSimonX** is a from-scratch rewrite of the original **MadSimon** project, with a complete rework of all its functionality and underlying techniques.  
 It replicates most of the original features, but now the source code is open.
 
